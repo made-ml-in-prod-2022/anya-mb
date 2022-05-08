@@ -91,3 +91,4 @@ target/
 
 # Mypy cache
 .mypy_cache/
+/ml_project/src/tmp_file
