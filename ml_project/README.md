@@ -4,9 +4,17 @@
 
 ## Usage
 
-train: `python3 src/main.py mode=train`
+Random Forest Classifier:
 
-predict: `python3 src/main.py mode=predict`
+* train: `python3 src/main.py mode=train model=rf`
+
+* predict: `python3 src/main.py mode=predict model=rf`
+
+Logistic Regression:
+
+* train: `python3 src/main.py mode=train model=logreg`
+
+* predict: `python3 src/main.py mode=predict model=logreg`
 
 If it's needed to run on different data, change 'data_path' (in config/mode/predict.yaml). 
 
@@ -54,4 +62,4 @@ PS: Можно использовать cookiecutter-data-science https://driven
 
 * Используйте hydra для конфигурирования (https://hydra.cc/docs/intro/) - 3 балла +
 
-Самооценка: 25-28 баллов. Тесты есть на отдельные функции и модули, но нет на train_pipeline и predict_pipeline. Нет кастомного трансформера. Остальное все присутствует. Это для меня первый такой проект, поэтому может быть что-то не так сделано, но я старалась разобраться.
+Самооценка: 24-28 баллов. Тесты есть на отдельные функции и модули, но нет на train_pipeline и predict_pipeline. Нет кастомного трансформера. Остальное все присутствует. Это для меня первый такой проект, поэтому может быть что-то не так сделано, но я старалась разобраться.
