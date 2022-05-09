@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from typing import Dict, Union
+from typing import Dict, Union, Tuple
 from os.path import join
 import json
 
@@ -32,7 +32,7 @@ class TrainingParams:
 
 def split_data(
     data: pd.DataFrame, target_column: str, random_state: int, test_size: float
-):
+) -> Tuple:
     X = data.drop(columns=target_column)
     y = data[target_column]
 

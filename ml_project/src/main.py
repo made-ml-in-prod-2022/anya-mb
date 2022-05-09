@@ -4,7 +4,6 @@ import logging
 import hydra
 from omegaconf import DictConfig
 
-
 from train import train_pipeline, TrainingParams
 from predict import predict_pipeline, PredictingParams
 
