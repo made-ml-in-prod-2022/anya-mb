@@ -1,6 +1,5 @@
 import pytest
-from train import read_data
-from utils import save_object, load_object
+from utils import save_object, load_object, read_data
 import py
 from os.path import join
 
