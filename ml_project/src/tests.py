@@ -9,20 +9,26 @@ from train import split_data, save_metrics
 from predict import save_predictions
 
 DATA_PATH = 'data/heart_cleveland_upload.csv'
-TMP_DIR = py.path.local('.')
+TMP_DIR = py.path.local('./src/test_data')
 TMP_FILE = join(TMP_DIR, 'tmp_file')
+FAKE_DATA_FILEPATH = join(TMP_DIR, 'fake_data.csv')
 FAKE_DATA_LEN = 100
 
 
-def make_fake_data(length=FAKE_DATA_LEN) -> pd.DataFrame:
+def make_fake_data(length=FAKE_DATA_LEN):
     data = pd.read_csv(DATA_PATH)
-
     sample = {}
 
+    # sample fake data by columns
     for col in data.columns:
         sample[col] = np.random.choice(data[col].values, size=length, replace=True)
 
-    return pd.DataFrame(data=sample)
+    pd.DataFrame(data=sample).to_csv(FAKE_DATA_FILEPATH, index=False)
+
+
+def read_fake_data() -> pd.DataFrame:
+    fake_data = pd.read_csv(FAKE_DATA_FILEPATH)
+    return fake_data
 
 
 def test_read_data_read_correct_file():
@@ -44,7 +50,8 @@ def test_save_object_and_load_object_are_the_same():
 
 
 def test_split_data():
-    data = make_fake_data(10)
+    make_fake_data(10)
+    data = read_fake_data()
     n_feature_columns = data.shape[1] - 1
     target_column = 'condition'
     random_state = 5
