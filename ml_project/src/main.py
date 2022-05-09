@@ -1,3 +1,6 @@
+import sys
+import logging
+
 from omegaconf import DictConfig, OmegaConf
 import hydra
 
@@ -5,13 +8,10 @@ from train import train_pipeline, TrainingParams
 from predict import predict_pipeline, PredictingParams
 
 
-# MODELS_PATH = '../models'
-# DATA_PATH = '../data/heart_cleveland_upload.csv'
-# TARGET_COLUMN = 'condition'
-#
-# RANDOM_STATE = 91
-# TEST_SIZE = 0.2
-# MODEL_NAME = 'RF'
+logger = logging.getLogger(__name__)
+handler = logging.StreamHandler(sys.stdout)
+logger.setLevel(logging.INFO)
+logger.addHandler(handler)
 
 
 @hydra.main(config_path='../config', config_name='config')

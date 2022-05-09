@@ -16,6 +16,12 @@ from sklearn.metrics import roc_auc_score, accuracy_score
 from utils import read_data, save_object
 
 
+logger = logging.getLogger(__name__)
+# handler = logging.StreamHandler(sys.stdout)
+# logger.setLevel(logging.INFO)
+# logger.addHandler(handler)
+
+
 @dataclass
 class TrainingParams:
     model: dict
@@ -55,16 +61,21 @@ def save_metrics(metrics: dict, models_path: str):
 
 
 def train_pipeline(cfg: TrainingParams):
+    logger.info(f'Start train pipeline with parameters: {cfg}')
     data = read_data(cfg.data_path)
-    print('Reading data')
+    logger.info(f'data.shape is {data.shape}')
 
     X_train, X_test, y_train, y_test = split_data(data, cfg.target_column, cfg.random_state, cfg.test_size)
+    logger.info(f'X_train.shape is {X_train.shape}, y_train.shape is {y_train.shape}')
 
     model = instantiate(cfg.model)
+    logger.info(f'Model is {model}')
+
     model.fit(X_train, y_train)
-    print('Fitting model')
+    logger.info('Model fitted')
 
     save_object(model, cfg.model_path, 'model.pkl')
+    logger.info('Model saved')
 
     metrics_train = get_metrics(X_train, y_train, model)
     metrics_test = get_metrics(X_test, y_test, model)
@@ -72,5 +83,7 @@ def train_pipeline(cfg: TrainingParams):
     metrics = {'train': metrics_train,
                'test': metrics_test}
 
+    logger.info(f'metrics are {metrics}')
+
     save_metrics(metrics, cfg.model_path)
-    print('Metrics saved')
+    logger.info('Metrics saved')
