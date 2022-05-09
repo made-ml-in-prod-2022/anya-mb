@@ -1,3 +1,0 @@
-train: false
-predictions_path: '../../../../predictions'
-data_path: '../../../../data/heart_cleveland_upload.csv'

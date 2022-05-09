@@ -1,4 +1,4 @@
 train: true
 test_size: 0.2
 #data_path: '../data/heart_cleveland_upload.csv'
-data_path: '../../../../data/heart_cleveland_upload.csv'
+data_path: '../../../data/heart_cleveland_upload.csv'
