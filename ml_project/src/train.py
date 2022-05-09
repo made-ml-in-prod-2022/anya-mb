@@ -1,3 +1,5 @@
+import logging
+import sys
 from dataclasses import dataclass
 from typing import Dict
 from os.path import join
@@ -11,15 +13,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_auc_score, accuracy_score
 
-from utils import read_data
-
-MODELS_PATH = '../models'
-DATA_PATH = '../data/heart_cleveland_upload.csv'
-TARGET_COLUMN = 'condition'
-
-RANDOM_STATE = 91
-TEST_SIZE = 0.2
-MODEL_NAME = 'RF'
+from utils import read_data, save_object
 
 
 @dataclass
@@ -30,6 +24,7 @@ class TrainingParams:
     test_size: float
     data_path: str
     target_column: str
+    log_path: str
 
 
 def split_data(
@@ -44,33 +39,15 @@ def split_data(
     return X_train, X_test, y_train, y_test
 
 
-# def fit_model(
-#     model_name, X, y
-# ):
-#     if model_name == 'LR':
-#         model = LogisticRegression(random_state=RANDOM_STATE)
-#     elif model_name == 'RF':
-#         model = RandomForestClassifier(random_state=RANDOM_STATE)
-#     else:
-#         raise NotImplementedError()
-#
-#     model.fit(X, y)
-#     return model
-
-
-def get_metrics(
-    X, y, model
-) -> Dict[str, float]:
-    preds = model.predict(X)
-    accuracy = accuracy_score(y, preds)
-    roc_auc = roc_auc_score(y, preds)
+def get_metrics(X, y, model) -> Dict[str, float]:
+    predictions = model.predict(X)
+    accuracy = accuracy_score(y, predictions)
+    roc_auc = roc_auc_score(y, predictions)
     return {'accuracy': accuracy,
             'roc_auc': roc_auc}
 
 
-def save_metrics(
-    metrics: dict, models_path: str
-):
+def save_metrics(metrics: dict, models_path: str):
     metric_path = join(models_path, 'metrics.json')
 
     with open(metric_path, 'w') as outfile:
@@ -86,6 +63,9 @@ def train_pipeline(cfg: TrainingParams):
     model = instantiate(cfg.model)
     model.fit(X_train, y_train)
     print('Fitting model')
+
+    save_object(model, cfg.model_path, 'model.pkl')
+
     metrics_train = get_metrics(X_train, y_train, model)
     metrics_test = get_metrics(X_test, y_test, model)
 

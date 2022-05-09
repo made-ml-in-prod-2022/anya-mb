@@ -1,5 +1,5 @@
 import pytest
-from train_model import read_data
+from train import read_data
 from utils import save_object, load_object
 import py
 from os.path import join
@@ -15,7 +15,7 @@ def test_read_data_read_correct_file():
     )
 
 
-def test_save_objectand_load_object_are_the_same():
+def test_save_object_and_load_object_are_the_same():
     expected_str = 'cerwvtrwva'
     save_object(expected_str, TMP_DIR, 'tmp_file')
 

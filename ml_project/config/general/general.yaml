@@ -1,4 +1,5 @@
 random_state: 91
 #model_path: '../models'
-target_column: 'condition'
 model_path: '../../../../models'
+log_path: '../../../../logs'
+target_column: 'condition'
