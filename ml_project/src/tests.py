@@ -1,4 +1,3 @@
-import pytest
 from utils import save_object, load_object, read_data
 import py
 from os.path import join
