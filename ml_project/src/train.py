@@ -1,7 +1,6 @@
 import logging
-import sys
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Union
 from os.path import join
 import json
 
@@ -17,9 +16,7 @@ from utils import read_data, save_object
 
 
 logger = logging.getLogger(__name__)
-# handler = logging.StreamHandler(sys.stdout)
-# logger.setLevel(logging.INFO)
-# logger.addHandler(handler)
+ClassificationModel = Union[LogisticRegression, RandomForestClassifier]
 
 
 @dataclass
@@ -34,7 +31,7 @@ class TrainingParams:
 
 
 def split_data(
-    data, target_column, random_state, test_size
+    data: pd.DataFrame, target_column: str, random_state: int, test_size: float
 ):
     X = data.drop(columns=target_column)
     y = data[target_column]
@@ -45,8 +42,8 @@ def split_data(
     return X_train, X_test, y_train, y_test
 
 
-def get_metrics(X, y, model) -> Dict[str, float]:
-    predictions = model.predict(X)
+def get_metrics(x: pd.DataFrame, y: pd.DataFrame, model: ClassificationModel) -> Dict[str, float]:
+    predictions = model.predict(x)
     accuracy = accuracy_score(y, predictions)
     roc_auc = roc_auc_score(y, predictions)
     return {'accuracy': accuracy,

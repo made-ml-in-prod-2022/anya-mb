@@ -2,10 +2,11 @@ from os.path import join
 import logging
 from dataclasses import dataclass
 
-from utils import read_data, load_object
-
 import numpy as np
 import pandas as pd
+
+from utils import read_data, load_object
+
 
 logger = logging.getLogger(__name__)
 

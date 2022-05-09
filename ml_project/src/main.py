@@ -1,8 +1,9 @@
 import sys
 import logging
 
-from omegaconf import DictConfig, OmegaConf
 import hydra
+from omegaconf import DictConfig
+
 
 from train import train_pipeline, TrainingParams
 from predict import predict_pipeline, PredictingParams
@@ -16,7 +17,7 @@ logger.addHandler(handler)
 
 @hydra.main(config_path='../config', config_name='config')
 def app(cfg: DictConfig):
-    print(cfg)
+    logger.info(f'Start app with parameters: {cfg}')
 
     model_path = cfg['general']['model_path']
     log_path = cfg['general']['log_path']
