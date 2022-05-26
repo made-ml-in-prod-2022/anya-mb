@@ -13,6 +13,9 @@ from utils import read_data, save_object, ClassificationModel
 
 logger = logging.getLogger(__name__)
 
+MODEL_NAME = 'model.pkl'
+METRICS_NAME = 'metrics.json'
+
 
 @dataclass
 class TrainingParams:
@@ -45,7 +48,7 @@ def get_metrics(y: pd.DataFrame, predictions, pred_probas) -> Dict[str, float]:
 
 
 def save_metrics(metrics: dict, models_path: str):
-    metric_path = join(models_path, 'metrics.json')
+    metric_path = join(models_path, METRICS_NAME)
 
     with open(metric_path, 'w') as outfile:
         json.dump(metrics, outfile)
@@ -71,7 +74,7 @@ def train_pipeline(cfg: TrainingParams):
     model.fit(X_train, y_train)
     logger.info('Model fitted')
 
-    save_object(model, cfg.model_path, 'model.pkl')
+    save_object(model, cfg.model_path, MODEL_NAME)
     logger.info('Model saved')
 
     predictions_train, pred_probas_train = predict(X_train, model)
