@@ -1,7 +1,11 @@
 from os.path import join
+from typing import Union
 import pickle
-
 import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+
+ClassificationModel = Union[LogisticRegression, RandomForestClassifier]
 
 
 def read_data(data_filepath: str) -> pd.DataFrame:
@@ -9,14 +13,14 @@ def read_data(data_filepath: str) -> pd.DataFrame:
     return data
 
 
-def save_object(obj: object, path: str, filename: str):
+def save_object(obj: ClassificationModel, path: str, filename: str):
     filepath = join(path, filename)
 
     with open(filepath, "wb") as handle:
         pickle.dump(obj, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def load_object(filepath: str) -> object:
+def load_object(filepath: str) -> ClassificationModel:
     with open(filepath, "rb") as f:
         obj = pickle.load(f)
     return obj

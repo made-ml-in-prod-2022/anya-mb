@@ -1,22 +1,17 @@
+import json
 import logging
 from dataclasses import dataclass
-from typing import Dict, Union, Tuple
 from os.path import join
-import json
-
-from hydra.utils import instantiate
+from typing import Dict, Tuple
 
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
+from hydra.utils import instantiate
 from sklearn.metrics import roc_auc_score, accuracy_score
+from sklearn.model_selection import train_test_split
 
-from utils import read_data, save_object
-
+from utils import read_data, save_object, ClassificationModel
 
 logger = logging.getLogger(__name__)
-ClassificationModel = Union[LogisticRegression, RandomForestClassifier]
 
 
 @dataclass
