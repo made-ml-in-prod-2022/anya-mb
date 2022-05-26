@@ -40,9 +40,9 @@ def split_data(
     return X_train, X_test, y_train, y_test
 
 
-def get_metrics(y: pd.DataFrame, predictions, pred_probas) -> Dict[str, float]:
-    accuracy = accuracy_score(y, predictions)
-    roc_auc = roc_auc_score(y, pred_probas)
+def get_metrics(target: pd.DataFrame, predictions, pred_probas) -> Dict[str, float]:
+    accuracy = accuracy_score(target, predictions)
+    roc_auc = roc_auc_score(target, pred_probas)
     return {'accuracy': accuracy,
             'roc_auc': roc_auc}
 
@@ -54,9 +54,9 @@ def save_metrics(metrics: dict, models_path: str):
         json.dump(metrics, outfile)
 
 
-def predict(x: pd.DataFrame, model: ClassificationModel) -> Tuple:
-    predictions = model.predict(x)
-    pred_probas = model.predict_proba(x)
+def predict(features: pd.DataFrame, model: ClassificationModel) -> Tuple:
+    predictions = model.predict(features)
+    pred_probas = model.predict_proba(features)
     return predictions, pred_probas
 
 
