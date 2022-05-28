@@ -11,57 +11,61 @@ from sklearn.exceptions import NotFittedError
 from utils import save_object, load_object
 
 DEFAULT_THRESHOLD_FOR_CATEGORICAL = 6
+TRANSFORMER_STATE_FILENAME = 'transformer_state.pkl'
 logger = logging.getLogger(__name__)
+
+
+class TransformerState:
+    def __init__(self, cat_feats, num_feats, scaler, ohe):
+        self.cat_feats = cat_feats
+        self.num_feats = num_feats
+        self.scaler = scaler
+        self.ohe = ohe
 
 
 class ExperimentalTransformer(BaseEstimator):
     def __init__(self, model_path, cat_feats_threshold=DEFAULT_THRESHOLD_FOR_CATEGORICAL):
         self.fitted = False
         self.n_unique_values_threshold_for_categorical = cat_feats_threshold
-        self.cat_feats = None
-        self.num_feats = None
-        self.scaler = None
-        self.ohe = None
+        self.transformer_state = None
         self.model_path = model_path
 
     def fit(self, X):
         feats = self._get_categorical_and_numerical_features_labels(X)
-        self.cat_feats, self.num_feats = feats
+        cat_feats, num_feats = feats
 
-        self.ohe = OneHotEncoder()
-        self.ohe.fit(X[self.cat_feats])
+        ohe = OneHotEncoder()
+        ohe.fit(X[cat_feats])
 
-        self.scaler = StandardScaler()
-        self.scaler.fit(X[self.num_feats])
+        scaler = StandardScaler()
+        scaler.fit(X[num_feats])
+
+        self.transformer_state = TransformerState(cat_feats, num_feats, scaler, ohe)
 
         self.fitted = True
 
         return self
 
     def save_to_file(self):
-        if self.ohe is None or self.scaler is None:
+        if self.transformer_state is None:
             raise Exception("At least one param to save is None")
-        save_object(self.ohe, self.model_path, 'ohe.pkl')
-        save_object(self.scaler, self.model_path, 'scaler.pkl')
+        save_object(self.transformer_state, self.model_path, TRANSFORMER_STATE_FILENAME)
 
     def transform(self, X_):
-        if (not self.fitted) or (not self.scaler) or (not self.ohe):
+        if self.fitted is False:
             raise NotFittedError
 
         X = X_.copy()
 
-        for col in self.cat_feats + self.num_feats:
+        for col in self.transformer_state.cat_feats + self.transformer_state.num_feats:
             if col not in X:
                 raise AttributeError
 
-        if not self.ohe:
-            self.ohe = load_object(join(self.model_path, 'ohe.pkl'))
+        if not self.transformer_state:
+            self.transformer_state = load_object(join(self.model_path, TRANSFORMER_STATE_FILENAME))
 
-        if not self.scaler:
-            self.scaler = load_object(join(self.model_path, 'scaler.pkl'))
-
-        hot = pd.DataFrame(self.ohe.transform(X[self.cat_feats]).toarray())
-        scal = pd.DataFrame(self.scaler.transform(X[self.num_feats]))
+        hot = pd.DataFrame(self.transformer_state.ohe.transform(X[self.transformer_state.cat_feats]).toarray())
+        scal = pd.DataFrame(self.transformer_state.scaler.transform(X[self.transformer_state.num_feats]))
         full_transformed = pd.concat([hot, scal], axis=1)
 
         full_transformed.columns = [f'col_{i}' for i in range(full_transformed.shape[1])]
