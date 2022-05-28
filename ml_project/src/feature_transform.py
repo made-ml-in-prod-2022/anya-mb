@@ -10,15 +10,14 @@ from sklearn.exceptions import NotFittedError
 
 from utils import save_object, load_object
 
-
-N_UNIQUE_VALUES_THRESHOLD_FOR_CATEGORICAL = 6
+DEFAULT_THRESHOLD_FOR_CATEGORICAL = 6
 logger = logging.getLogger(__name__)
 
 
 class ExperimentalTransformer(BaseEstimator):
-    def __init__(self, model_path):
+    def __init__(self, model_path, cat_feats_threshold=DEFAULT_THRESHOLD_FOR_CATEGORICAL):
         self.fitted = False
-        self.N_UNIQUE_VALUES_THRESHOLD_FOR_CATEGORICAL = 6
+        self.n_unique_values_threshold_for_categorical = cat_feats_threshold
         self.cat_feats = None
         self.num_feats = None
         self.scaler = None
@@ -26,20 +25,24 @@ class ExperimentalTransformer(BaseEstimator):
         self.model_path = model_path
 
     def fit(self, X):
-        feats = self.get_categorical_and_numerical_features_labels(X)
+        feats = self._get_categorical_and_numerical_features_labels(X)
         self.cat_feats, self.num_feats = feats
 
         self.ohe = OneHotEncoder()
         self.ohe.fit(X[self.cat_feats])
-        save_object(self.ohe, self.model_path, 'ohe.pkl')
 
         self.scaler = StandardScaler()
         self.scaler.fit(X[self.num_feats])
-        save_object(self.scaler, self.model_path, 'scaler.pkl')
 
         self.fitted = True
 
         return self
+
+    def save_to_file(self):
+        if self.ohe is None or self.scaler is None:
+            raise Exception("At least one param to save is None")
+        save_object(self.ohe, self.model_path, 'ohe.pkl')
+        save_object(self.scaler, self.model_path, 'scaler.pkl')
 
     def transform(self, X_):
         if (not self.fitted) or (not self.scaler) or (not self.ohe):
@@ -70,13 +73,13 @@ class ExperimentalTransformer(BaseEstimator):
         full_transformed = self.transform(X_)
         return full_transformed
 
-    def get_categorical_and_numerical_features_labels(self, X):
+    def _get_categorical_and_numerical_features_labels(self, X):
         cols_df = X.nunique().to_frame().reset_index()
         cols_df = cols_df.rename(columns={'index': 'column_name', 0: 'n_unique'})
 
         all_feats = cols_df['column_name'].tolist()
 
-        cat_feats = cols_df[cols_df['n_unique'] < N_UNIQUE_VALUES_THRESHOLD_FOR_CATEGORICAL] \
+        cat_feats = cols_df[cols_df['n_unique'] < self.n_unique_values_threshold_for_categorical] \
             ['column_name'].tolist()
         num_feats = [x for x in all_feats if x not in cat_feats]
 
