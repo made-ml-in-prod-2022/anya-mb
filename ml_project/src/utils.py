@@ -4,6 +4,7 @@ import pickle
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
+import os
 
 ClassificationModel = Union[LogisticRegression, RandomForestClassifier]
 
@@ -24,3 +25,6 @@ def load_object(filepath: str) -> ClassificationModel:
     with open(filepath, "rb") as f:
         obj = pickle.load(f)
     return obj
+
+def get_project_root():
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
