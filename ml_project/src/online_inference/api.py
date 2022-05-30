@@ -19,7 +19,6 @@ def health_check():
 
 @app.post("/predict")
 def predict(request: PredictItemInputRequest):
-    print(request)
     columns = ["age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca",
                "thal"]
     df = pd.DataFrame([[request.age, request.sex, request.cp, request.trestbps, request.chol,

@@ -8,7 +8,6 @@ from utils import load_object
 class ModelWrapper:
     def __init__(self, model_path):
         self.model_path = model_path
-        # self.target_column = target_column
 
         model_filepath = join(model_path, MODEL_NAME)
         self.model = load_object(model_filepath)
