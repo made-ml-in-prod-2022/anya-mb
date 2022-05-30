@@ -44,7 +44,7 @@ def split_data(
 
 def get_metrics(target: pd.DataFrame, predictions, pred_probas) -> Dict[str, float]:
     accuracy = accuracy_score(target, predictions)
-    roc_auc = roc_auc_score(target, pred_probas)
+    roc_auc = roc_auc_score(target, pred_probas[:, 1])
     return {'accuracy': accuracy,
             'roc_auc': roc_auc}
 

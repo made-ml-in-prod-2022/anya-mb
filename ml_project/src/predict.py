@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from ml_project.src.feature_transform import ExperimentalTransformer
+from feature_transform import ExperimentalTransformer
 from train import MODEL_NAME
 from utils import read_data, load_object
 
