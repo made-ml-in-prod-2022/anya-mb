@@ -1,38 +1,38 @@
 import logging
 import pandas as pd
+from dataclasses import dataclass
 from sklearn.base import BaseEstimator
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from os.path import join
-import pickle
 
 from sklearn.exceptions import NotFittedError
 
 from utils import save_object, load_object
 
 DEFAULT_THRESHOLD_FOR_CATEGORICAL = 6
-TRANSFORMER_STATE_FILENAME = 'transformer_state.pkl'
 logger = logging.getLogger(__name__)
 
 
+@dataclass
 class TransformerState:
-    def __init__(self, cat_feats, num_feats, scaler, ohe):
-        self.cat_feats = cat_feats
-        self.num_feats = num_feats
-        self.scaler = scaler
-        self.ohe = ohe
+    cat_features: list
+    num_features: list
+    ohe: OneHotEncoder
+    scaler: StandardScaler
 
 
 class ExperimentalTransformer(BaseEstimator):
+    _TRANSFORMER_FILE_NAME = "transformer.pkl"
+
     def __init__(self, model_path, cat_feats_threshold=DEFAULT_THRESHOLD_FOR_CATEGORICAL):
         self.fitted = False
         self.n_unique_values_threshold_for_categorical = cat_feats_threshold
-        self.transformer_state = None
+        self.state: TransformerState = None
         self.model_path = model_path
 
     def fit(self, X):
-        feats = self._get_categorical_and_numerical_features_labels(X)
-        cat_feats, num_feats = feats
+        cat_feats, num_feats = self._get_categorical_and_numerical_features_labels(X)
 
         ohe = OneHotEncoder()
         ohe.fit(X[cat_feats])
@@ -40,32 +40,35 @@ class ExperimentalTransformer(BaseEstimator):
         scaler = StandardScaler()
         scaler.fit(X[num_feats])
 
-        self.transformer_state = TransformerState(cat_feats, num_feats, scaler, ohe)
-
         self.fitted = True
+        self.state = TransformerState(cat_feats, num_feats, ohe, scaler)
 
         return self
 
     def save_to_file(self):
-        if self.transformer_state is None:
-            raise Exception("At least one param to save is None")
-        save_object(self.transformer_state, self.model_path, TRANSFORMER_STATE_FILENAME)
+        if self.state is None:
+            raise Exception("state is empty. Fit transformer first")
+        save_object(self.state, self.model_path, self._TRANSFORMER_FILE_NAME)
+
+    def load_from_file(self):
+        self.fitted = True
+        self.state = load_object(join(self.model_path, self._TRANSFORMER_FILE_NAME))
 
     def transform(self, X_):
-        if self.fitted is False:
+        if (not self.fitted) or (not self.state):
             raise NotFittedError
 
         X = X_.copy()
 
-        for col in self.transformer_state.cat_feats + self.transformer_state.num_feats:
+        if not self.state:
+            self.load_from_file()
+
+        for col in self.state.cat_features + self.state.num_features:
             if col not in X:
                 raise AttributeError
 
-        if not self.transformer_state:
-            self.transformer_state = load_object(join(self.model_path, TRANSFORMER_STATE_FILENAME))
-
-        hot = pd.DataFrame(self.transformer_state.ohe.transform(X[self.transformer_state.cat_feats]).toarray())
-        scal = pd.DataFrame(self.transformer_state.scaler.transform(X[self.transformer_state.num_feats]))
+        hot = pd.DataFrame(self.state.ohe.transform(X[self.state.cat_features]).toarray())
+        scal = pd.DataFrame(self.state.scaler.transform(X[self.state.num_features]))
         full_transformed = pd.concat([hot, scal], axis=1)
 
         full_transformed.columns = [f'col_{i}' for i in range(full_transformed.shape[1])]
@@ -87,4 +90,4 @@ class ExperimentalTransformer(BaseEstimator):
             ['column_name'].tolist()
         num_feats = [x for x in all_feats if x not in cat_feats]
 
-        return (cat_feats, num_feats)
+        return cat_feats, num_feats

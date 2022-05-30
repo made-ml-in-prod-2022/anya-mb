@@ -73,14 +73,20 @@ def train_pipeline(cfg: TrainingParams):
     model = instantiate(cfg.model)
     logger.info(f'Model is {model}')
 
-    model.fit(X_train, y_train)
+    transformer = ExperimentalTransformer(cfg.model_path)
+
+    X_train_transformed = transformer.fit_transform(X_train)
+    X_test_transformed = transformer.transform(X_test)
+    transformer.save_to_file()
+
+    model.fit(X_train_transformed, y_train)
     logger.info('Model fitted')
 
     save_object(model, cfg.model_path, MODEL_NAME)
     logger.info('Model saved')
 
-    predictions_train, pred_probas_train = predict(X_train, model)
-    predictions_test, pred_probas_test = predict(X_test, model)
+    predictions_train, pred_probas_train = predict(X_train_transformed, model)
+    predictions_test, pred_probas_test = predict(X_test_transformed, model)
 
     logger.info('Predictions generated')
 

@@ -13,7 +13,7 @@ MODEL_PATH = "/tmp"
 def transformer():
     return ExperimentalTransformer(
         MODEL_PATH,
-        cat_feats_threshold=CAT_FEATS_THRESHOLD)
+        CAT_FEATS_THRESHOLD)
 
 
 @pytest.fixture

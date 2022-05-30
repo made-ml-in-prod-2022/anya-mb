@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
+from ml_project.src.feature_transform import ExperimentalTransformer
 from train import MODEL_NAME
 from utils import read_data, load_object
 
@@ -40,7 +41,12 @@ def predict_pipeline(cfg: PredictingParams):
     model = load_object(model_filepath)
     logger.info(f'Model is {model}')
 
-    predictions = model.predict(data)
+    transformer = ExperimentalTransformer(cfg.model_path)
+    transformer.load_from_file()
+
+    data_transformed = transformer.transform(data)
+
+    predictions = model.predict(data_transformed)
     logger.info(f'predictions.shape is {predictions.shape}')
 
     save_predictions(predictions, cfg.predictions_path)
