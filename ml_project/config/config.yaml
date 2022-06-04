@@ -1,0 +1,5 @@
+defaults:
+  - mode: train
+  - general: general
+  - model: rf
+
