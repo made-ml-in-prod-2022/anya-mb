@@ -1,4 +1,11 @@
+from dataclasses import dataclass
+
 from pydantic import BaseModel, validator
+
+
+@dataclass
+class ResponseModel:
+    prediction: float
 
 
 class PredictItemInputRequest(BaseModel):

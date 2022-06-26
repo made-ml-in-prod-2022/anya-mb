@@ -11,4 +11,4 @@ COPY ./models /code/models
 
 COPY ./src /code/src
 
-CMD ["uvicorn", "online_inference.api:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "80"]

@@ -1,7 +1,7 @@
 from os.path import join
 
 from feature_transform import ExperimentalTransformer
-from train import MODEL_NAME
+from constants import MODEL_NAME
 from utils import load_object
 
 
