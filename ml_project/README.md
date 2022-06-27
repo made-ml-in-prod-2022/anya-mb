@@ -21,10 +21,13 @@ If it's needed to run on different data, change 'data_path' (in config/mode/pred
 Model can be changed with 'model_path' parameter in config/general/general.yaml.
 
 ## Tests
+```
+export PYTHONPATH=src 
+pytest
+```
 
-`pytest -v src/tests.py`
 
-## Criteria
+## Criteria HW1
 
 Критерии (указаны максимальные баллы, по каждому критерию ревьюер может поставить баллы частично):
 
